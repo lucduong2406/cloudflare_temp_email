@@ -1,0 +1,135 @@
+/* Design tokens. Spacing, radius, type and motion resolve through these values only. */
+:root {
+  --font-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --spacing-0: 0;
+  --spacing-25: 2px;
+  --spacing-50: 4px;
+  --spacing-75: 8px;
+  --spacing-100: 12px;
+  --spacing-200: 16px;
+  --spacing-300: 24px;
+  --spacing-400: 32px;
+  --spacing-500: 40px;
+  --spacing-600: 48px;
+  --spacing-700: 64px;
+  --spacing-800: 80px;
+  --spacing-900: 96px;
+
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+
+  --ease-base: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-color: 300ms;
+  --duration-layout: 500ms;
+
+  --surface-base: #ffffff;
+  --surface-raised: #ffffff;
+  --text-base: #131209;
+  --text-muted: #666666;
+  --border-base: rgba(19, 18, 9, 0.12);
+  --focus-ring: #131209;
+}
+
+:root[data-theme='dark'] {
+  --surface-base: #000000;
+  --surface-raised: #181818;
+  --text-base: #ffffff;
+  --text-muted: #9b9b9b;
+  --border-base: #313131;
+  --focus-ring: #ffffff;
+}
+
+html {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-style: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  font-weight: 600;
+}
+
+p, li, .n-text {
+  text-wrap: pretty;
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-mono);
+}
+
+/* Named text styles. Sizes come from the Tailwind scale. */
+.heading-1 { font-size: 60px; line-height: 60px; font-weight: 600; }
+.heading-2 { font-size: 48px; line-height: 48px; font-weight: 600; }
+.heading-3 { font-size: 36px; line-height: 40px; font-weight: 600; }
+.heading-4 { font-size: 30px; line-height: 36px; font-weight: 600; }
+.heading-5 { font-size: 24px; line-height: 32px; font-weight: 600; }
+.heading-6 { font-size: 20px; line-height: 28px; font-weight: 600; }
+.title-1 { font-size: 20px; line-height: 28px; font-weight: 500; }
+.title-2 { font-size: 18px; line-height: 28px; font-weight: 500; }
+.title-3 { font-size: 16px; line-height: 24px; font-weight: 500; }
+.title-4 { font-size: 14px; line-height: 20px; font-weight: 500; }
+.body-3 { font-size: 16px; line-height: 24px; font-weight: 400; }
+.body-6 { font-size: 14px; line-height: 20px; font-weight: 400; }
+.button-md { font-size: 16px; line-height: 24px; font-weight: 600; }
+.button-sm { font-size: 14px; line-height: 20px; font-weight: 600; }
+.caption-2 { font-size: 14px; line-height: 20px; font-weight: 400; }
+.caption-5 { font-size: 12px; line-height: 16px; font-weight: 400; }
+
+/* Visible keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-md);
+}
+
+/* Skip link for keyboard users. */
+.skip-link {
+  position: absolute;
+  top: var(--spacing-75);
+  left: var(--spacing-75);
+  z-index: 3000;
+  padding: var(--spacing-75) var(--spacing-100);
+  background: var(--surface-raised);
+  color: var(--text-base);
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--duration-layout) var(--ease-base);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Tactile feedback on buttons, transform only. */
+.n-button {
+  transition-timing-function: var(--ease-base);
+}
+
+.n-button:not(.n-button--disabled):active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-property: opacity !important;
+    transition-duration: 0.01ms !important;
+  }
+}

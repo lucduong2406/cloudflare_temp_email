@@ -2,6 +2,7 @@
 import {
   darkTheme,
 } from 'naive-ui'
+import { buildThemeOverrides } from './styles/theme-overrides'
 import { computed, onMounted, watchEffect } from 'vue'
 import { useHead } from '@unhead/vue'
 import { useI18n } from 'vue-i18n'
@@ -21,6 +22,7 @@ const adClient = APP_CONFIG.GOOGLE_AD_CLIENT;
 const adSlot = APP_CONFIG.GOOGLE_AD_SLOT;
 const { locale } = useI18n({ useScope: 'global' });
 const theme = computed(() => isDark.value ? darkTheme : null)
+const themeOverrides = computed(() => buildThemeOverrides(isDark.value))
 const localeConfig = computed(() => getNaiveLocaleConfig(isSupportedLocale(locale.value) ? locale.value : DEFAULT_LOCALE))
 const isMobile = useIsMobile()
 const showSideMargin = computed(() => !isMobile.value && useSideMargin.value);
@@ -30,6 +32,7 @@ const gridMaxCols = computed(() => showAd.value ? 8 : 12);
 watchEffect(() => {
   if (typeof document === 'undefined') return
   document.documentElement.lang = isSupportedLocale(locale.value) ? locale.value : DEFAULT_LOCALE
+  document.documentElement.dataset.theme = isDark.value ? 'dark' : 'light'
 })
 
 if (showAd.value) {
@@ -88,9 +91,11 @@ onMounted(async () => {
 </script>
 
 <template>
-  <n-config-provider :locale="localeConfig.locale" :date-locale="localeConfig.dateLocale" :theme="theme">
+  <n-config-provider :locale="localeConfig.locale" :date-locale="localeConfig.dateLocale" :theme="theme"
+    :theme-overrides="themeOverrides">
     <n-global-style />
-    <n-spin description="loading..." :show="loading">
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <n-spin description="Loading" :show="loading">
       <n-notification-provider container-style="margin-top: 60px;">
         <n-message-provider container-style="margin-top: 20px;">
           <n-grid x-gap="12" :cols="gridMaxCols">
@@ -105,7 +110,9 @@ onMounted(async () => {
                 <n-space vertical>
                   <n-layout style="min-height: 80vh;">
                     <Header />
-                    <router-view></router-view>
+                    <main id="main-content" tabindex="-1">
+                      <router-view></router-view>
+                    </main>
                   </n-layout>
                   <Footer />
                 </n-space>
