@@ -10,7 +10,7 @@ import { ptBRMessages } from './locales/source/ptBR'
 import type { SupportedLocale } from './locale-registry'
 
 type LocaleTree = Record<string, unknown>
-type SourceLocale = Extract<SupportedLocale, 'en' | 'zh'>
+type SourceLocale = Extract<SupportedLocale, 'en'>
 type AdditionalLocale = Exclude<SupportedLocale, SourceLocale>
 
 const additionalLocaleSources: Record<AdditionalLocale, Record<string, string>> = {
@@ -64,7 +64,6 @@ const buildAdditionalLocaleMessages = (locale: AdditionalLocale) => {
 }
 
 export const I18N_MESSAGES: Record<SupportedLocale, LocaleTree> = {
-  zh: buildSourceLocaleMessages('zh'),
   en: buildSourceLocaleMessages('en'),
   es: buildAdditionalLocaleMessages('es'),
   'pt-BR': buildAdditionalLocaleMessages('pt-BR'),

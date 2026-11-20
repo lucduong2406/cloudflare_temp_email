@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test';
 import { FRONTEND_URL } from '../../fixtures/test-helpers';
 
 for (const [locale, mails, webhook, testLabel, specified, mailId, invalid] of [
-  ['zh', '邮件', '邮件 Webhook', '测试', '指定 ID', '邮件 ID', '请输入有效的正整数邮件 ID'],
   ['en', 'Emails', 'Mail Webhook', 'Test', 'Specify ID', 'Email ID', 'Enter a valid positive integer email ID'],
   ['es', 'Correos', 'Webhook de correo', 'Prueba', 'Especificar ID', 'ID del correo', 'Introduce un ID de correo válido que sea un entero positivo'],
   ['pt-BR', 'E-mails', 'Webhook de e-mail', 'Teste', 'Especificar ID', 'ID do e-mail', 'Digite um ID de e-mail válido que seja um número inteiro positivo'],
@@ -35,40 +34,40 @@ test('Webhook test dialog selects random or specified email', async ({ page }) =
     requests.push(route.request().postDataJSON());
     return route.fulfill({ status: fail ? 404 : 200, body: fail ? 'Mail not found' : '{"success":true}' });
   });
-  await page.goto(`${FRONTEND_URL}/zh/admin`);
-  await page.getByText('邮件', { exact: true }).click();
-  await page.getByText('邮件 Webhook', { exact: true }).click();
-  const open = page.locator('#app').getByRole('button', { name: '测试', exact: true });
+  await page.goto(`${FRONTEND_URL}/en/admin`);
+  await page.getByText('Emails', { exact: true }).click();
+  await page.getByText('Mail Webhook', { exact: true }).click();
+  const open = page.locator('#app').getByRole('button', { name: 'Test', exact: true });
   await open.click();
   const dialog = page.getByRole('dialog');
-  await expect(dialog.getByText('随机邮件', { exact: true })).toBeVisible();
-  await expect(dialog.getByPlaceholder('邮件 ID', { exact: true })).toHaveCount(0);
-  await dialog.getByRole('button', { name: '取消', exact: true }).click();
+  await expect(dialog.getByText('Random email', { exact: true })).toBeVisible();
+  await expect(dialog.getByPlaceholder('Email ID', { exact: true })).toHaveCount(0);
+  await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(requests).toHaveLength(0);
   await open.click();
-  await dialog.getByRole('button', { name: '测试', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Test', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(requests).toHaveLength(1);
   expect(requests[0]).not.toHaveProperty('mail_id');
   await open.click();
-  await dialog.getByText('指定 ID', { exact: true }).click();
-  await dialog.getByRole('button', { name: '测试', exact: true }).click();
-  await expect(page.getByText('请输入有效的正整数邮件 ID', { exact: true })).toBeVisible();
+  await dialog.getByText('Specify ID', { exact: true }).click();
+  await dialog.getByRole('button', { name: 'Test', exact: true }).click();
+  await expect(page.getByText('Enter a valid positive integer email ID', { exact: true })).toBeVisible();
   expect(requests).toHaveLength(1);
-  await dialog.getByPlaceholder('邮件 ID', { exact: true }).fill('123');
+  await dialog.getByPlaceholder('Email ID', { exact: true }).fill('123');
   fail = true;
-  await dialog.getByRole('button', { name: '测试', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Test', exact: true }).click();
   await expect(page.getByText(/Mail not found/).first()).toBeVisible();
   await expect(dialog).toBeVisible();
   expect(requests[1].mail_id).toBe(123);
   fail = false;
-  await dialog.getByRole('button', { name: '测试', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Test', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(requests[2].mail_id).toBe(123);
   await open.click();
-  await dialog.getByText('随机邮件', { exact: true }).click();
-  await dialog.getByRole('button', { name: '测试', exact: true }).click();
+  await dialog.getByText('Random email', { exact: true }).click();
+  await dialog.getByRole('button', { name: 'Test', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(requests[3]).not.toHaveProperty('mail_id');
 });

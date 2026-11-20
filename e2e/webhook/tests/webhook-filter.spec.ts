@@ -8,7 +8,6 @@ const expression = { operator: 'and', children: [
 ] };
 
 const adminLabels: Record<string, { mails: string; webhook: string; condition: string }> = {
-  zh: { mails: '邮件', webhook: '邮件 Webhook', condition: '匹配条件' },
   en: { mails: 'Emails', webhook: 'Mail Webhook', condition: 'Condition' },
   es: { mails: 'Correos', webhook: 'Webhook de correo', condition: 'Condición' },
   'pt-BR': { mails: 'E-mails', webhook: 'Webhook de e-mail', condition: 'Condição' },
@@ -16,7 +15,7 @@ const adminLabels: Record<string, { mails: string; webhook: string; condition: s
   de: { mails: 'E-Mails', webhook: 'Mail-Webhook', condition: 'Bedingung' },
 };
 
-async function openAdminWebhook(page: Page, locale = 'zh') {
+async function openAdminWebhook(page: Page, locale = 'en') {
   const { mails, webhook } = adminLabels[locale];
   await page.goto(`${FRONTEND_URL}/${locale}/admin`);
   await page.getByText(mails, { exact: true }).click();
@@ -78,7 +77,7 @@ test('Webhook configures the generic editor with server-supported fields and ope
   }
 });
 
-for (const [operator, label] of [['equals', '等于'], ['contains', '包含'], ['startsWith', '开头匹配'], ['endsWith', '结尾匹配']]) {
+for (const [operator, label] of [['equals', 'Equals'], ['contains', 'Contains'], ['startsWith', 'Starts with'], ['endsWith', 'Ends with']]) {
   test(`Case-sensitive operator selection round-trips JSON: ${operator}`, async ({ page }) => {
     const original = { field: 'subject', operator: `${operator}CaseSensitive`, value: 'DOWN' };
     const saved: any[] = [];
@@ -88,11 +87,11 @@ for (const [operator, label] of [['equals', '等于'], ['contains', '包含'], [
     });
     await openAdminWebhook(page);
     const editor = page.getByTestId('filter-editor').first();
-    const selector = editor.locator('[aria-label="操作符"]');
-    const sensitiveLabel = `${label} (区分大小写)`;
+    const selector = editor.locator('[aria-label="Operator"]');
+    const sensitiveLabel = `${label} (Case sensitive)`;
     await expect(selector).toContainText(sensitiveLabel);
-    await expect(editor.getByRole('checkbox', { name: '区分大小写' })).toHaveCount(0);
-    const save = page.getByRole('button', { name: '保存', exact: true });
+    await expect(editor.getByRole('checkbox', { name: 'Case sensitive' })).toHaveCount(0);
+    const save = page.getByRole('button', { name: 'Save', exact: true });
     await save.click();
     await expect.poll(() => saved.at(-1)?.filter).toEqual(original);
     await selector.click();
@@ -105,7 +104,7 @@ for (const [operator, label] of [['equals', '等于'], ['contains', '包含'], [
     await expect.poll(() => saved.at(-1)?.filter).toEqual(original);
     await editor.getByText('JSON', { exact: true }).click();
     expect(JSON.parse(await editor.getByRole('textbox', { name: 'JSON', exact: true }).inputValue())).toEqual(original);
-    await editor.getByText('可视化', { exact: true }).click();
+    await editor.getByText('Visual', { exact: true }).click();
     await expect(selector).toContainText(sensitiveLabel);
   });
 }
@@ -128,23 +127,23 @@ test('Rule checking and legacy delivery use separate dialogs, requests and mail 
   });
   await openAdminWebhook(page);
   const editor = page.getByTestId('filter-editor').first();
-  await editor.locator('[aria-label="规则类型"]').click();
-  await page.locator('.n-base-select-option:visible').getByText('与：全部满足', { exact: true }).click();
+  await editor.locator('[aria-label="Rule type"]').click();
+  await page.locator('.n-base-select-option:visible').getByText('AND: all match', { exact: true }).click();
   const children = editor.locator(':scope > .filter-editor');
   await expect(children).toHaveCount(2);
   for (const child of await children.all()) {
     await expect(page.locator('.n-base-select-option:visible')).toHaveCount(0);
-    await child.locator('[aria-label="规则类型"]').click();
-    await page.locator('.n-base-select-option:visible').getByText('匹配条件', { exact: true }).click();
+    await child.locator('[aria-label="Rule type"]').click();
+    await page.locator('.n-base-select-option:visible').getByText('Condition', { exact: true }).click();
     await expect(page.locator('.n-base-select-option:visible')).toHaveCount(0);
-    await child.locator('[aria-label="字段"]').click();
-    await page.locator('.n-base-select-option:visible').getByText('发件人', { exact: true }).click();
+    await child.locator('[aria-label="Field"]').click();
+    await page.locator('.n-base-select-option:visible').getByText('Sender', { exact: true }).click();
     await expect(page.locator('.n-base-select-option:visible')).toHaveCount(0);
-    await child.locator('[aria-label="操作符"]').click();
-    await page.locator('.n-base-select-option:visible').getByText('包含', { exact: true }).click();
+    await child.locator('[aria-label="Operator"]').click();
+    await page.locator('.n-base-select-option:visible').getByText('Contains', { exact: true }).click();
   }
-  await editor.getByPlaceholder('匹配值', { exact: true }).first().fill('@example.com');
-  expect(await editor.locator('input[placeholder="匹配值"]').count()).toBe(2);
+  await editor.getByPlaceholder('Value', { exact: true }).first().fill('@example.com');
+  expect(await editor.locator('input[placeholder="Value"]').count()).toBe(2);
   await editor.getByText('JSON', { exact: true }).click();
   const json = editor.getByRole('textbox', { name: 'JSON', exact: true });
   const visual = JSON.parse(await json.inputValue());
@@ -152,51 +151,51 @@ test('Rule checking and legacy delivery use separate dialogs, requests and mail 
   expect(visual.children).toHaveLength(2);
   expect(visual.children[0].value).toBe('@example.com');
   await json.fill('{');
-  const save = page.getByRole('button', { name: '保存', exact: true });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
   await expect(save).toBeDisabled();
   await json.fill(JSON.stringify(expression));
   await expect(save).toBeEnabled();
-  await editor.getByText('可视化', { exact: true }).click();
-  await expect(editor.getByPlaceholder('匹配值', { exact: true }).first()).toHaveValue('^DOWN');
+  await editor.getByText('Visual', { exact: true }).click();
+  await expect(editor.getByPlaceholder('Value', { exact: true }).first()).toHaveValue('^DOWN');
   const saveResponse = page.waitForResponse(res => res.url().endsWith('/admin/mail_webhook/settings') && res.request().method() === 'POST');
   await save.click();
   expect((await saveResponse).status()).toBe(200);
   expect(saved.at(-1).filter).toEqual(expression);
-  await expect(page.getByText('成功', { exact: true })).toBeVisible();
-  const openTest = page.locator('#app').getByRole('button', { name: '测试', exact: true });
-  const openCheck = page.locator('#app').getByRole('button', { name: '仅检查规则', exact: true });
+  await expect(page.getByText('Success', { exact: true })).toBeVisible();
+  const openTest = page.locator('#app').getByRole('button', { name: 'Test', exact: true });
+  const openCheck = page.locator('#app').getByRole('button', { name: 'Check only', exact: true });
   await openCheck.click();
-  await expect(page.getByRole('dialog').getByRole('button', { name: '测试', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Test', exact: true })).toHaveCount(0);
   await expect(page.locator('.n-message')).toHaveCount(0);
   await testInfo.attach('Independent rule check dialog', { body: await page.screenshot({ animations: 'disabled' }), contentType: 'image/png' });
-  await page.getByRole('dialog').getByRole('button', { name: '仅检查规则', exact: true }).click();
-  await expect(page.getByText('条件不匹配，未发送 Webhook', { exact: true })).toBeVisible();
+  await page.getByRole('dialog').getByRole('button', { name: 'Check only', exact: true }).click();
+  await expect(page.getByText('Conditions did not match; webhook not sent', { exact: true })).toBeVisible();
   expect(checked.at(-1)).toEqual({ filter: expression });
   expect(tested).toHaveLength(0);
   const urlInput = page.locator('.n-form-item').filter({ has: page.getByText('URL', { exact: true }) }).getByRole('textbox');
   await urlInput.fill('');
   await openCheck.click();
-  await page.getByRole('dialog').getByText('指定 ID', { exact: true }).click();
-  await page.getByRole('dialog').getByRole('button', { name: '仅检查规则', exact: true }).click();
+  await page.getByRole('dialog').getByText('Specify ID', { exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Check only', exact: true }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   expect(checked).toHaveLength(1);
-  await page.getByRole('dialog').getByPlaceholder('邮件 ID', { exact: true }).fill('123');
-  await page.getByRole('dialog').getByRole('button', { name: '仅检查规则', exact: true }).click();
+  await page.getByRole('dialog').getByPlaceholder('Email ID', { exact: true }).fill('123');
+  await page.getByRole('dialog').getByRole('button', { name: 'Check only', exact: true }).click();
   await expect.poll(() => checked.at(-1)).toEqual({ filter: expression, mail_id: 123 });
   expect(tested).toHaveLength(0);
   await urlInput.fill(settings.url);
   await openTest.click();
-  await expect(page.getByRole('dialog').getByRole('button', { name: '仅检查规则', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByRole('button', { name: 'Check only', exact: true })).toHaveCount(0);
   await expect(page.locator('.n-message')).toHaveCount(0);
   await testInfo.attach('Unchanged delivery test dialog', { body: await page.screenshot({ animations: 'disabled' }), contentType: 'image/png' });
-  await expect(page.getByRole('dialog').getByPlaceholder('邮件 ID', { exact: true })).toHaveCount(0);
+  await expect(page.getByRole('dialog').getByPlaceholder('Email ID', { exact: true })).toHaveCount(0);
   const deliveryResponse = page.waitForResponse(res => res.url().endsWith('/admin/mail_webhook/test') && res.request().method() === 'POST');
-  await page.getByRole('dialog').getByRole('button', { name: '测试', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Test', exact: true }).click();
   expect((await deliveryResponse).status()).toBe(200);
   expect(tested.at(-1)).toMatchObject({ filter: expression });
   expect(tested.at(-1)).not.toHaveProperty('mail_id');
   expect(checked).toHaveLength(2);
-  await editor.getByRole('button', { name: '移除', exact: true }).first().click();
+  await editor.getByRole('button', { name: 'Remove', exact: true }).first().click();
   const clearResponse = page.waitForResponse(res => res.url().endsWith('/admin/mail_webhook/settings') && res.request().method() === 'POST');
   await save.click();
   expect((await clearResponse).status()).toBe(200);
@@ -211,39 +210,39 @@ test('Four node types share one selector with fixed slots and recursive nesting'
   });
   await openAdminWebhook(page);
   const editor = page.getByTestId('filter-editor').first();
-  const save = page.getByRole('button', { name: '保存', exact: true });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
   const choose = async (node: ReturnType<Page['locator']>, label: string) => {
-    await node.locator(':scope > .node-toolbar [aria-label="规则类型"]').click();
+    await node.locator(':scope > .node-toolbar [aria-label="Rule type"]').click();
     await expect(page.locator('.n-base-select-option__content:visible')).toHaveText([
-      '匹配条件', '与：全部满足', '或：任一满足', '非：取反',
+      'Condition', 'AND: all match', 'OR: any match', 'NOT: negate',
     ]);
     await page.locator('.n-base-select-option:visible').getByText(label, { exact: true }).click();
   };
   const fill = async (node: ReturnType<Page['locator']>, field: string, value: string) => {
-    await choose(node, '匹配条件');
+    await choose(node, 'Condition');
     await expect(save).toBeDisabled();
-    await node.locator('[aria-label="字段"]').click();
+    await node.locator('[aria-label="Field"]').click();
     await page.locator('.n-base-select-option:visible').getByText(field, { exact: true }).click();
-    await node.locator('[aria-label="操作符"]').click();
-    await page.locator('.n-base-select-option:visible').getByText('包含', { exact: true }).click();
-    await node.getByPlaceholder('匹配值', { exact: true }).fill(value);
+    await node.locator('[aria-label="Operator"]').click();
+    await page.locator('.n-base-select-option:visible').getByText('Contains', { exact: true }).click();
+    await node.getByPlaceholder('Value', { exact: true }).fill(value);
   };
-  await fill(editor, '主题', 'DOWN');
+  await fill(editor, 'Subject', 'DOWN');
   await save.click();
   await expect.poll(() => saved.at(-1)?.filter).toEqual({ field: 'subject', operator: 'contains', value: 'DOWN' });
-  await choose(editor, '与：全部满足');
+  await choose(editor, 'AND: all match');
   const slots = editor.locator(':scope > .filter-editor');
   await expect(slots).toHaveCount(2);
   await expect(save).toBeDisabled();
-  await fill(slots.nth(0), '主题', 'DOWN');
-  await choose(slots.nth(1), '或：任一满足');
+  await fill(slots.nth(0), 'Subject', 'DOWN');
+  await choose(slots.nth(1), 'OR: any match');
   const inner = slots.nth(1).locator(':scope > .filter-editor');
   await expect(inner).toHaveCount(2);
-  await fill(inner.nth(0), '发件人', '@example.com');
-  await choose(inner.nth(1), '非：取反');
+  await fill(inner.nth(0), 'Sender', '@example.com');
+  await choose(inner.nth(1), 'NOT: negate');
   const negated = inner.nth(1).locator(':scope > .filter-editor');
   await expect(negated).toHaveCount(1);
-  await fill(negated, '纯文本正文', 'maintenance');
+  await fill(negated, 'Plain text', 'maintenance');
   await expect(save).toBeEnabled();
   await save.click();
   const nested = { operator: 'and', children: [
@@ -254,18 +253,18 @@ test('Four node types share one selector with fixed slots and recursive nesting'
     ] },
   ] };
   await expect.poll(() => saved.at(-1)?.filter).toEqual(nested);
-  await choose(editor, '或：任一满足');
+  await choose(editor, 'OR: any match');
   await save.click();
   await expect.poll(() => saved.at(-1)?.filter).toEqual({ ...nested, operator: 'or' });
-  await slots.nth(0).getByRole('button', { name: '移除', exact: true }).click();
+  await slots.nth(0).getByRole('button', { name: 'Remove', exact: true }).click();
   await expect(slots).toHaveCount(2);
   await expect(save).toBeDisabled();
-  await editor.getByRole('button', { name: '移除', exact: true }).first().click();
+  await editor.getByRole('button', { name: 'Remove', exact: true }).first().click();
   await expect(save).toBeEnabled();
   await save.click();
   await expect.poll(() => saved.at(-1)?.filter).toBeNull();
-  await expect(editor.getByRole('button', { name: '包入条件组', exact: true })).toHaveCount(0);
-  await expect(editor.getByRole('button', { name: '添加条件', exact: true })).toHaveCount(0);
+  await expect(editor.getByRole('button', { name: 'Wrap in group', exact: true })).toHaveCount(0);
+  await expect(editor.getByRole('button', { name: 'Add condition', exact: true })).toHaveCount(0);
 });
 
 test('Rule check errors and loading state never affect legacy delivery tests', async ({ page }) => {
@@ -285,27 +284,27 @@ test('Rule check errors and loading state never affect legacy delivery tests', a
   });
   try {
     await openAdminWebhook(page);
-    const openCheck = page.locator('#app').getByRole('button', { name: '仅检查规则', exact: true });
+    const openCheck = page.locator('#app').getByRole('button', { name: 'Check only', exact: true });
     await openCheck.click();
     const dialog = page.getByRole('dialog');
-    await dialog.getByText('指定 ID', { exact: true }).click();
-    await dialog.getByPlaceholder('邮件 ID', { exact: true }).fill('987');
-    await dialog.getByRole('button', { name: '仅检查规则', exact: true }).click();
+    await dialog.getByText('Specify ID', { exact: true }).click();
+    await dialog.getByPlaceholder('Email ID', { exact: true }).fill('987');
+    await dialog.getByRole('button', { name: 'Check only', exact: true }).click();
     await expect(page.getByText('[400]: Cannot evaluate filter', { exact: true })).toBeVisible();
     await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: '取消', exact: true }).click();
-    await page.locator('#app').getByRole('button', { name: '测试', exact: true }).click();
-    await dialog.getByText('指定 ID', { exact: true }).click();
-    await dialog.getByPlaceholder('邮件 ID', { exact: true }).fill('123');
-    await dialog.getByRole('button', { name: '测试', exact: true }).click();
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await page.locator('#app').getByRole('button', { name: 'Test', exact: true }).click();
+    await dialog.getByText('Specify ID', { exact: true }).click();
+    await dialog.getByPlaceholder('Email ID', { exact: true }).fill('123');
+    await dialog.getByRole('button', { name: 'Test', exact: true }).click();
     await expect.poll(() => sent.at(-1)?.mail_id).toBe(123);
     await expect(dialog).toHaveCount(0);
     await openCheck.click();
-    await expect(dialog.getByPlaceholder('邮件 ID', { exact: true })).toHaveValue('987');
-    await dialog.getByRole('button', { name: '仅检查规则', exact: true }).click();
+    await expect(dialog.getByPlaceholder('Email ID', { exact: true })).toHaveValue('987');
+    await dialog.getByRole('button', { name: 'Check only', exact: true }).click();
     await expect.poll(() => checked.length).toBe(2);
-    await expect(dialog.getByRole('button', { name: '取消', exact: true })).toBeDisabled();
-    await expect(dialog.getByPlaceholder('邮件 ID', { exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeDisabled();
+    await expect(dialog.getByPlaceholder('Email ID', { exact: true })).toBeDisabled();
     release!();
     await expect(dialog).toHaveCount(0);
     expect(checked).toEqual([{ filter: expression, mail_id: 987 }, { filter: expression, mail_id: 987 }]);
@@ -325,7 +324,7 @@ test('Invalid JSON draft does not prevent disabling the webhook', async ({ page 
   const editor = page.getByTestId('filter-editor').first();
   await editor.getByText('JSON', { exact: true }).click();
   await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill('{');
-  const save = page.getByRole('button', { name: '保存', exact: true });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
   await expect(save).toBeDisabled();
   await page.locator('.n-card').filter({ has: editor }).getByRole('switch').click();
   await expect(save).toBeEnabled();
@@ -343,8 +342,8 @@ test('Nested visual edits and failed saves never mutate the last saved filter', 
   });
   await openAdminWebhook(page);
   const editor = page.getByTestId('filter-editor').first();
-  const values = editor.getByRole('textbox', { name: '匹配值', exact: true });
-  const save = page.getByRole('button', { name: '保存', exact: true });
+  const values = editor.getByRole('textbox', { name: 'Value', exact: true });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
   const toggle = page.locator('.n-card').filter({ has: save }).getByRole('switch');
   await values.first().fill('^EDITED');
   await values.nth(1).fill('paused');
@@ -354,7 +353,7 @@ test('Nested visual edits and failed saves never mutate the last saved filter', 
   ] }] };
   await editor.getByText('JSON', { exact: true }).click();
   await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill(JSON.stringify(updated));
-  await editor.getByText('可视化', { exact: true }).click();
+  await editor.getByText('Visual', { exact: true }).click();
   const failed = page.waitForResponse(res => res.url().endsWith('/admin/mail_webhook/settings') && res.request().method() === 'POST');
   await save.click();
   expect((await failed).status()).toBe(500);
@@ -383,7 +382,7 @@ for (const original of [expression, null]) {
         expect((await request.post(endpoint, { data: { ...settings, filter: original } })).ok()).toBe(true);
         await openAdminWebhook(page);
         const editor = page.getByTestId('filter-editor').first();
-        const save = page.getByRole('button', { name: '保存', exact: true });
+        const save = page.getByRole('button', { name: 'Save', exact: true });
         const toggle = page.locator('.n-card').filter({ has: save }).getByRole('switch');
         const valid = { field: 'subject', operator: 'regex', value: '^UPDATED', options: { flags: 'i' } };
         const saveAndRead = async () => {
@@ -396,8 +395,8 @@ for (const original of [expression, null]) {
           await editor.getByText('JSON', { exact: true }).click();
           await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill(JSON.stringify(valid));
           if (mode === 'regex') {
-            await editor.getByText('可视化', { exact: true }).click();
-            await editor.getByRole('textbox', { name: '匹配值', exact: true }).fill('[');
+            await editor.getByText('Visual', { exact: true }).click();
+            await editor.getByRole('textbox', { name: 'Value', exact: true }).fill('[');
           } else {
             await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill(mode === 'json' ? '{' : JSON.stringify({ ...valid, field: 'headerFrom' }));
           }
@@ -406,7 +405,7 @@ for (const original of [expression, null]) {
             const response = page.waitForResponse(res => res.url().endsWith('/admin/mail_webhook/settings') && res.request().method() === 'POST');
             await save.click();
             expect((await response).status()).toBe(400);
-            await expect(page.getByText(/\[400\]: 无效的过滤规则/).last()).toBeVisible();
+            await expect(page.getByText(/\[400\]: Invalid filter/).last()).toBeVisible();
             expect((await (await request.get(endpoint)).json()).filter ?? null).toEqual(expectedFilter);
           } else {
             await expect(save).toBeDisabled();
@@ -417,13 +416,13 @@ for (const original of [expression, null]) {
           await toggle.click();
           if (mode === 'regex') {
             await expect(save).toBeEnabled();
-            await expect(editor.getByRole('textbox', { name: '匹配值', exact: true })).toHaveValue('[');
-            await editor.getByRole('textbox', { name: '匹配值', exact: true }).fill('^UPDATED');
+            await expect(editor.getByRole('textbox', { name: 'Value', exact: true })).toHaveValue('[');
+            await editor.getByRole('textbox', { name: 'Value', exact: true }).fill('^UPDATED');
           } else {
             await expect(save).toBeDisabled();
             await expect(editor.getByRole('textbox', { name: 'JSON', exact: true })).toHaveValue(mode === 'json' ? '{' : JSON.stringify({ ...valid, field: 'headerFrom' }));
             await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill(JSON.stringify(valid));
-            await editor.getByText('可视化', { exact: true }).click();
+            await editor.getByText('Visual', { exact: true }).click();
           }
           await expect(save).toBeEnabled();
           expect(await saveAndRead()).toMatchObject({ enabled: true, filter: valid });
@@ -520,9 +519,9 @@ test('Invalid editor structure blocks saving and rule checking but never legacy 
   });
   await openAdminWebhook(page);
   const editor = page.getByTestId('filter-editor').first();
-  const save = page.getByRole('button', { name: '保存', exact: true });
-  const openTest = page.locator('#app').getByRole('button', { name: '测试', exact: true });
-  const openCheck = page.locator('#app').getByRole('button', { name: '仅检查规则', exact: true });
+  const save = page.getByRole('button', { name: 'Save', exact: true });
+  const openTest = page.locator('#app').getByRole('button', { name: 'Test', exact: true });
+  const openCheck = page.locator('#app').getByRole('button', { name: 'Check only', exact: true });
   await editor.getByText('JSON', { exact: true }).click();
   const json = editor.getByRole('textbox', { name: 'JSON', exact: true });
   const leaf = { field: 'subject', operator: 'regex', value: '^DOWN', options: { flags: 'i' } };
@@ -543,14 +542,14 @@ test('Invalid editor structure blocks saving and rule checking but never legacy 
     await expect(openTest).toBeEnabled();
   }
   await openTest.click();
-  await page.getByRole('dialog').getByRole('button', { name: '测试', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Test', exact: true }).click();
   await expect.poll(() => sent.length).toBe(1);
   await expect.poll(() => page.getByRole('dialog').count()).toBe(0);
   expect(saved).toHaveLength(0);
   expect(tested).toHaveLength(0);
   await json.fill(JSON.stringify(leaf));
-  await editor.getByText('可视化', { exact: true }).click();
-  const value = editor.getByRole('textbox', { name: '匹配值', exact: true });
+  await editor.getByText('Visual', { exact: true }).click();
+  const value = editor.getByRole('textbox', { name: 'Value', exact: true });
   await value.fill('[');
   await expect(save).toBeEnabled();
   await expect(openCheck).toBeEnabled();
@@ -561,7 +560,7 @@ test('Invalid editor structure blocks saving and rule checking but never legacy 
   await save.click();
   await expect.poll(() => saved.at(-1)?.filter).toEqual(leaf);
   await openCheck.click();
-  await page.getByRole('dialog').getByRole('button', { name: '仅检查规则', exact: true }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Check only', exact: true }).click();
   await expect.poll(() => tested.at(-1)?.filter).toEqual(leaf);
 });
 
@@ -574,8 +573,8 @@ test('Depth disables further grouping and node limits block saving without losin
   for (let i = 0; i < 7; i++) deep = { operator: 'not', children: [deep] };
   await editor.getByText('JSON', { exact: true }).click();
   await editor.getByRole('textbox', { name: 'JSON', exact: true }).fill(JSON.stringify(deep));
-  await editor.getByText('可视化', { exact: true }).click();
-  await editor.locator('[aria-label="规则类型"]').last().click();
+  await editor.getByText('Visual', { exact: true }).click();
+  await editor.locator('[aria-label="Rule type"]').last().click();
   await expect(page.locator('.n-base-select-option:visible')).toHaveCount(4);
   await expect(page.locator('.n-base-select-option:visible.n-base-select-option--disabled')).toHaveCount(3);
   await page.keyboard.press('Escape');
@@ -585,12 +584,12 @@ test('Depth disables further grouping and node limits block saving without losin
   await editor.getByText('JSON', { exact: true }).click();
   const json = editor.getByRole('textbox', { name: 'JSON', exact: true });
   await json.fill(JSON.stringify(tree(50)));
-  await expect(page.getByRole('button', { name: '保存', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeEnabled();
   await json.fill(JSON.stringify(tree(51)));
-  await expect(page.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
   await json.fill(JSON.stringify(deep));
-  await editor.getByText('可视化', { exact: true }).click();
-  await expect(editor.getByRole('button', { name: '移除', exact: true }).first()).toBeVisible();
+  await editor.getByText('Visual', { exact: true }).click();
+  await expect(editor.getByRole('button', { name: 'Remove', exact: true }).first()).toBeVisible();
 });
 
 for (const [locale, labels] of Object.entries(adminLabels)) {

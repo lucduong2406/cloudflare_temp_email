@@ -278,10 +278,10 @@ for (const layout of [
       }
 
       if (layout.name === 'desktop split') {
-        await page.goto(`${FRONTEND_URL}/zh/?jwt=${jwt}`);
+        await page.goto(`${FRONTEND_URL}/en/?jwt=${jwt}`);
         await item.locator('.mail-summary-subject').click();
-        await page.getByRole('button', { name: '更多操作', exact: true }).click();
-        await page.getByRole('button', { name: '邮件详情', exact: true }).click();
+        await page.getByRole('button', { name: 'More actions', exact: true }).click();
+        await page.getByRole('button', { name: 'Mail details', exact: true }).click();
         await expect(details.getByRole('heading', { name: 'Mail details', exact: true }).first()).toBeVisible();
         expect(await details.locator('.n-descriptions-table-content__label').allTextContents()).toEqual(
           expect.arrayContaining(['Subject:', 'From:', 'Received at:', 'Message-ID:', 'ID:'])
@@ -426,10 +426,10 @@ test('attachment action keeps its label, count and downloads on narrow mobile', 
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
 
-    await page.goto(`${FRONTEND_URL}/zh/?jwt=${jwt}`);
+    await page.goto(`${FRONTEND_URL}/en/?jwt=${jwt}`);
     await page.getByRole('listitem').getByText(subject).click();
-    const localizedAttachments = page.getByRole('button', { name: '附件', exact: true });
-    await expect(localizedAttachments).toContainText('附件');
+    const localizedAttachments = page.getByRole('button', { name: 'Attachments', exact: true });
+    await expect(localizedAttachments).toContainText('Attachments');
     await expect(localizedAttachments.locator('.n-badge-sup')).toHaveAttribute('title', '2');
     for (const theme of ['dark', 'light']) {
       await page.evaluate(value => localStorage.setItem('vueuse-color-scheme', value), theme);
@@ -471,7 +471,6 @@ for (const width of [1360, 320]) {
       });
       for (const labels of [
         { locale: 'en', from: 'From', to: 'To' },
-        { locale: 'zh', from: '发件人', to: '收件人' },
       ]) {
         await page.goto(`${FRONTEND_URL}/${labels.locale}/admin`);
         const item = page.getByRole('listitem').filter({ hasText: subject });

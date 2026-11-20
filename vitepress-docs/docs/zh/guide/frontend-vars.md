@@ -37,7 +37,7 @@ VITE_DEFAULT_LANG=en
 | ENV 变量 | `app-config` 字段 | 是否必须 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- | --- |
 | `VITE_API_BASE` | `API_BASE` | 视部署方式 | 文本 | 空 | 以 `https://` 开头的后端 API 根地址，不要带结尾 `/`；空值表示使用同域 API |
-| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | 否 | 文本 | `zh` | 默认语言，支持 `zh`、`en`、`es`、`pt-BR`、`ja`、`de` |
+| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | 否 | 文本 | `en` | 默认语言，支持 `en`、`es`、`pt-BR`、`ja`、`de` |
 | `VITE_CF_WEB_ANALY_TOKEN` | `CF_WEB_ANALY_TOKEN` | 否 | 文本 | 空 | Cloudflare Web Analytics Token |
 | `VITE_IS_TELEGRAM` | `IS_TELEGRAM` | 否 | 布尔值 | `false` | 是否启用 Telegram Mini App，详见 [Telegram 配置](/zh/guide/feature/telegram) |
 | `VITE_GOOGLE_AD_CLIENT` | `GOOGLE_AD_CLIENT` | 否 | 文本 | 空 | Google AdSense Client ID，详见 [Google Ads 配置](/zh/guide/feature/google-ads) |

@@ -120,7 +120,7 @@ const getTelegramBindings = async (c: Context<HonoCustomType>, userId: string) =
         try {
             return { jwt, payload: await Jwt.verify(jwt, c.env.JWT_SECRET, { alg: 'HS256', exp: false }) };
         } catch (e) {
-            console.log(`解绑失败: ${(e as Error).message}`);
+            console.log(`Unbind failed: ${(e as Error).message}`);
             return { jwt, payload: null };
         }
     }));

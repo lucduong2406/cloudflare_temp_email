@@ -17,10 +17,8 @@ const test = base.extend<{ originalSettings: Record<string, unknown> }>({
 
 test.describe.configure({ lock: 'forwarding-settings' });
 
-for (const locale of ['en', 'zh']) {
-  const labels = locale === 'en'
-    ? { tab: 'Global Mailbox Settings', config: 'Config', save: 'Save', deleteOriginal: 'Delete original after forwarding', blockUnknown: 'Block receive unknow address email', any: 'Any', all: 'All', invalid: 'Invalid regex pattern', tooLong: 'Regex pattern too long' }
-    : { tab: '全局邮箱设置', config: '配置', save: '保存', deleteOriginal: '转发成功后删除原邮件', blockUnknown: '禁止接收未知地址邮件', any: '任一', all: '全部', invalid: '无效的正则表达式', tooLong: '正则表达式过长' };
+for (const locale of ['en']) {
+  const labels = { tab: 'Global Mailbox Settings', config: 'Config', save: 'Save', deleteOriginal: 'Delete original after forwarding', blockUnknown: 'Block receive unknow address email', any: 'Any', all: 'All', invalid: 'Invalid regex pattern', tooLong: 'Regex pattern too long' };
 
   test(`persists recipient filters and the forwarding delete-original switch (${locale})`, async ({ page, request, originalSettings: settings }, testInfo) => {
     expect((await request.post(`${WORKER_URL}/admin/account_settings`, {

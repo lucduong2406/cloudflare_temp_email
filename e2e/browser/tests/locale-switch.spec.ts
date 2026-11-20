@@ -36,25 +36,25 @@ const selectLanguage = async (page: Page, selectTrigger: Locator, optionLabel: s
 };
 
 test.describe('Locale switching', () => {
-  test('keeps default route in Chinese while persisting browser language preference', async ({ page }) => {
+  test('keeps default route in English while persisting browser language preference', async ({ page }) => {
     await installLocaleInitScript(page, ['es-ES', 'en-US']);
 
     await page.goto(`${FRONTEND_URL}/`);
 
     await expect(page).toHaveURL(`${FRONTEND_URL}/`);
     await expect.poll(() => page.evaluate(() => window.localStorage.getItem('preferredLocale'))).toBe('es');
-    await expect.poll(() => page.evaluate(() => document.documentElement.lang)).toBe('zh');
+    await expect.poll(() => page.evaluate(() => document.documentElement.lang)).toBe('en');
   });
 
   test('mobile drawer switch updates locale route and persisted preference', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 844 });
-    await installLocaleInitScript(page, ['zh-CN']);
+    await installLocaleInitScript(page, ['en-US']);
 
     await page.goto(`${FRONTEND_URL}/`);
 
-    await page.getByRole('button', { name: /菜单|Menu/i }).click();
+    await page.getByRole('button', { name: /Menu/i }).click();
 
-    const drawerLocaleDropdown = page.locator('.n-drawer').getByRole('button', { name: /中文|English|Español|Português|日本語|Deutsch/ }).first();
+    const drawerLocaleDropdown = page.locator('.n-drawer').getByRole('button', { name: /English|Español|Português|日本語|Deutsch/ }).first();
     await selectLanguage(page, drawerLocaleDropdown, 'Deutsch');
 
     await expect(page).toHaveURL(`${FRONTEND_URL}/de/`);

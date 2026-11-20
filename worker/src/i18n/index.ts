@@ -1,5 +1,4 @@
 import { LocaleMessages } from "./type";
-import zh from "./zh";
 import en from "./en";
 import { Context } from "hono";
 
@@ -9,7 +8,6 @@ export default {
     ): LocaleMessages => {
         // multi-language support
         if (locale === "en") return en;
-        if (locale === "zh") return zh;
 
         // fallback language
         return en;
@@ -20,7 +18,6 @@ export default {
         const locale = c?.get?.("lang") || c.env?.DEFAULT_LANG;
         // multi-language support
         if (locale === "en") return en;
-        if (locale === "zh") return zh;
 
         // fallback language
         return en;

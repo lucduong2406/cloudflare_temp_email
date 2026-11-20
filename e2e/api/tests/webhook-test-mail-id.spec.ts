@@ -56,7 +56,6 @@ test('Webhook tests support random and specified mail IDs with ownership checks'
       })).status()).toBe(404);
       expect(payloads).toHaveLength(count + 2);
       for (const [lang, invalid, missing] of [
-        ['zh', '无效的邮件 ID', '邮件不存在'],
         ['en', 'Invalid mail ID', 'Mail not found'],
       ]) {
         for (const body of ['null', '[]', '1', 'true', '"text"', '{', '']) {
@@ -65,7 +64,7 @@ test('Webhook tests support random and specified mail IDs with ownership checks'
             data: body,
           });
           expect(response.status()).toBe(400);
-          expect(await response.text()).toBe(lang === 'zh' ? '无效的请求体' : 'Invalid request body');
+          expect(await response.text()).toBe('Invalid request body');
         }
         for (const [mail_id, status, message] of [[0, 400, invalid], [999999999, 404, missing]] as const) {
           const response = await request.post(`${WORKER_URL}${endpoint}`, {

@@ -16,6 +16,7 @@
 
 ### Improvements
 
+- refactor: |多语言| 移除中文 (`zh`) 语言：前端与 Worker 不再提供中文界面、错误信息和 Telegram 文案，默认语言及回退语言改为 `en`，`DEFAULT_LANG` / `VITE_DEFAULT_LANG` 不再支持 `zh`（原 `/zh/...` 路由将不再有效）
 - refactor: |邮件解析| 将后端邮件解析提取为独立公共模块，保持解析行为和 WASM 切换方式不变
 - refactor: |有效期| 提取公共有效期判断与参数校验，移除重复查询和回退包装，创建参数统一为 `expiresAt`，校验日期格式及时区（须为有效日期、在将来且早于 2100 年 UTC），创建响应不再返回 `expires_at`，补字段仅在版本升级时执行
 

@@ -4,13 +4,11 @@ import {
   dateEsAR,
   dateJaJP,
   datePtBR,
-  dateZhCN,
   deDE,
   enUS,
   esAR,
   jaJP,
   ptBR,
-  zhCN,
 } from 'naive-ui'
 
 import type { NDateLocale, NLocale } from 'naive-ui'
@@ -29,13 +27,6 @@ type LocaleRegistryEntry = {
 }
 
 export const LOCALE_REGISTRY = [
-  {
-    locale: 'zh',
-    label: '中文',
-    browserMatches: ['zh'],
-    naive: { locale: zhCN, dateLocale: dateZhCN },
-    turnstileLocale: 'zh-CN',
-  },
   {
     locale: 'en',
     label: 'English',

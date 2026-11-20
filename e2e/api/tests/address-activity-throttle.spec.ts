@@ -334,13 +334,11 @@ for (const { base, disabled } of [
 
     test('manual inactivity cleanup protects the address and all related data when disabled', async ({ request }) => {
       const { mailbox, user } = await prepareRelated(request);
-      for (const lang of ['en', 'zh']) {
+      for (const lang of ['en']) {
         const response = await call(request, '/admin/cleanup', {
           method: 'POST', headers: { 'x-lang': lang }, data: { cleanType: 'inactiveAddress', cleanDays: 1 },
         }, disabled ? 500 : 200);
-        if (disabled) expect(await response.text()).toBe(lang === 'zh'
-          ? '清理失败，请检查清理配置；禁用地址活跃时间更新时，无法按不活跃时间清理。'
-          : 'Cleanup failed. Check your cleanup settings; inactive-address cleanup is unavailable when address activity updates are disabled.');
+        if (disabled) expect(await response.text()).toBe('Cleanup failed. Check your cleanup settings; inactive-address cleanup is unavailable when address activity updates are disabled.');
         else expect(await response.json()).toEqual({ success: true });
         expect(await relatedCounts(request, mailbox, user)).toEqual(disabled ? [1, 1, 1, 1, 1, 1] : [0, 0, 0, 0, 0, 0]);
       }

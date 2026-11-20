@@ -16,6 +16,7 @@
 
 ### Improvements
 
+- refactor: |i18n| Remove the Chinese (`zh`) locale: the frontend and Worker no longer ship Chinese UI text, error messages or Telegram copy; the default and fallback language is now `en`, and `DEFAULT_LANG` / `VITE_DEFAULT_LANG` no longer accept `zh` (existing `/zh/...` routes are no longer valid)
 - refactor: |Mail Parsing| Extract backend mail parsing into a shared module without changing parsing behavior or WASM selection
 - refactor: |Address Expiry| Extract shared expiry checks, remove duplicate queries and fallback wrappers, validate the format and time zone of `expiresAt` (a valid future date before 2100 UTC), omit `expires_at` from creation responses, and add the expiry column only during version migration
 

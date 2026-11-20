@@ -170,7 +170,7 @@ When `ADMIN_API_IP_WHITELIST` is unset or empty, source IPs are not restricted. 
 
 | Variable Name              | Type        | Required | Description                                                              | Default / When unset | Example               |
 | -------------------------- | ----------- | -------- | ------------------------------------------------------------------------ | -------------------- | --------------------- |
-| `DEFAULT_LANG`             | Text        | No       | Worker error message default language, supports `zh`/`en`                | General APIs fall back to `en`; Telegram falls back to `zh` | `zh` |
+| `DEFAULT_LANG`             | Text        | No       | Worker error message default language, supports `en`                | Falls back to `en` | `en` |
 | `TITLE`                    | Text        | No       | Custom frontend page website title, supports HTML                        | Built-in localized title | `Custom Title`    |
 | `ANNOUNCEMENT`             | Text        | No       | Custom frontend page announcement, supports HTML                         | Empty; hidden        | `Custom Announcement` |
 | `ALWAYS_SHOW_ANNOUNCEMENT` | Text/JSON   | No       | Whether to always show an announcement even when unchanged               | `false`              | `true`                |

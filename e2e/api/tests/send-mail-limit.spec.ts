@@ -330,7 +330,7 @@ test.describe('Send Mail Limit', () => {
     });
     expect(res.ok()).toBe(false);
     const text = await res.text();
-    expect(text).toContain('服务器今日发信次数已达上限');
+    expect(text).toContain('Server daily send quota has been reached');
 
     await deleteAddress(request, jwt);
   });

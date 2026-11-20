@@ -29,7 +29,7 @@ Change `VITE_API_BASE` to the `worker` `url` created in the previous step. Do no
 
 For example: `VITE_API_BASE=https://xxx.xxx.workers.dev`
 
-Set the frontend default language with `VITE_DEFAULT_LANG`. Supported values are `zh`, `en`, `es`, `pt-BR`, `ja`, and `de`; an unset or invalid value falls back to `zh`.
+Set the frontend default language with `VITE_DEFAULT_LANG`. Supported values are `en`, `es`, `pt-BR`, `ja`, and `de`; an unset or invalid value falls back to `en`.
 
 For example: `VITE_DEFAULT_LANG=en`
 

@@ -14,7 +14,7 @@ export const getRouterPathWithLang = (path: string, lang: string) => {
         || lang === 'ja'
         || lang === 'de'
         ? lang
-        : 'zh';
+        : 'en';
 
     return getPathWithLocale(path, normalizedLang);
 }

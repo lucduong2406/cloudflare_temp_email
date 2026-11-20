@@ -13,27 +13,26 @@ async function openCreate(page: Page, locale = 'en', domains = ['test.example.co
     await route.fulfill({ json: { ...await response.json(), domains, prefix: 'tmp', randomSubdomainDomains: domains } });
   });
   await page.goto(`${FRONTEND_URL}/${locale}/admin`);
-  await page.locator('.n-tabs-tab').getByText(locale === 'en' ? 'Create Email Address' : '创建邮箱', { exact: true }).click();
-  await expect(page.getByRole('radio', { name: locale === 'en' ? 'Single creation' : '单个创建', exact: true })).toBeChecked();
-  await expect(page.getByRole('textbox', { name: locale === 'en' ? 'Batch count' : '批量数量' })).toBeHidden();
-  await page.locator('.n-radio').getByText(locale === 'en' ? 'Batch creation' : '批量创建', { exact: true }).click();
-  await expect(page.getByRole('textbox', { name: locale === 'en' ? 'Batch count' : '批量数量' })).toBeVisible();
+  await page.locator('.n-tabs-tab').getByText('Create Email Address', { exact: true }).click();
+  await expect(page.getByRole('radio', { name: 'Single creation', exact: true })).toBeChecked();
+  await expect(page.getByRole('textbox', { name: 'Batch count' })).toBeHidden();
+  await page.locator('.n-radio').getByText('Batch creation', { exact: true }).click();
+  await expect(page.getByRole('textbox', { name: 'Batch count' })).toBeVisible();
 }
 
 const countInput = (page: Page) => page.getByRole('textbox', { name: 'Batch count' });
 const createBatch = (page: Page) => page.getByRole('button', { name: /Create batch$/ });
 const form = (page: Page) => page.locator('.n-card').filter({
-  has: page.getByRole('radio', { name: /^(Single creation|单个创建)$/ }),
+  has: page.getByRole('radio', { name: /^Single creation$/ }),
 });
 const row = (index: number) => ({ address: `server${index}@random.test.example.com`, jwt: `jwt${index}+/?=&%#`, address_id: index });
 
 const labels = {
   en: { open: 'Export CSV', download: 'Download CSV', close: 'Close', spreadsheet: /^Spreadsheet-safe CSV/, raw: /^Lossless CSV/ },
-  zh: { open: '导出 CSV', download: '下载 CSV', close: '关闭', spreadsheet: /^电子表格安全 CSV/, raw: /^无损 CSV/ },
 };
 
 // Downloads through the export dialog and parses the file with csv-parse, independent of the app's escaping.
-async function exportCsv(page: Page, { mode = 'spreadsheet', locale = 'en' }: { mode?: 'spreadsheet' | 'raw'; locale?: 'en' | 'zh' } = {}) {
+async function exportCsv(page: Page, { mode = 'spreadsheet', locale = 'en' }: { mode?: 'spreadsheet' | 'raw'; locale?: 'en' } = {}) {
   const text = labels[locale];
   await page.getByRole('button', { name: text.open, exact: true }).click();
   const modal = page.locator('.n-modal');
@@ -346,7 +345,7 @@ test('locks shared settings and mode switching for the entire sequential batch',
 
 for (const scenario of [
   { locale: 'en', status: 0, successes: 2 },
-  { locale: 'zh', status: 429, successes: 2 },
+  { locale: 'en', status: 429, successes: 2 },
   { locale: 'en', status: 500, successes: 0 },
 ]) {
   test(`stops after ${scenario.successes} successes on ${scenario.status || 'network failure'} (${scenario.locale})`, async ({ page }) => {
@@ -357,20 +356,19 @@ for (const scenario of [
       return scenario.status ? route.fulfill({ status: scenario.status, body: 'batch-test-failure' }) : route.abort('failed');
     });
     await openCreate(page, scenario.locale);
-    const chinese = scenario.locale === 'zh';
-    await page.getByRole('textbox', { name: chinese ? '批量数量' : 'Batch count' }).fill('5');
-    const button = page.getByRole('button', { name: chinese ? '批量创建' : 'Create batch', exact: true });
+    await page.getByRole('textbox', { name: 'Batch count' }).fill('5');
+    const button = page.getByRole('button', { name: 'Create batch', exact: true });
     await button.click();
-    await expect(page.getByText(chinese ? '已完成：2 / 5' : `Completed: ${scenario.successes} / 5`, { exact: true })).toBeVisible();
-    await expect(page.getByText(chinese ? /批量创建已停止。中断的请求/ : /Batch stopped\. Interrupted requests/)).toBeVisible();
+    await expect(page.getByText(`Completed: ${scenario.successes} / 5`, { exact: true })).toBeVisible();
+    await expect(page.getByText(/Batch stopped\. Interrupted requests/)).toBeVisible();
     if (scenario.status) await expect(page.locator('.n-alert')).toContainText('batch-test-failure');
     await expect(button).toBeEnabled();
     expect(calls).toBe(scenario.successes + 1);
     if (scenario.successes) {
-      const { records } = await exportCsv(page, { locale: chinese ? 'zh' : 'en' });
+      const { records } = await exportCsv(page, { locale: 'en' });
       expect(decodeRows(records)).toEqual(pick(Array.from({ length: scenario.successes }, (_, i) => row(i))));
     } else {
-      await expect(page.getByRole('button', { name: chinese ? '导出 CSV' : 'Export CSV' })).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Export CSV' })).toBeDisabled();
     }
     expect(calls).toBe(scenario.successes + 1);
   });
@@ -408,7 +406,7 @@ test('leaving the create pane stops an outstanding batch', async ({ page }) => {
   }
 });
 
-for (const locale of ['en', 'zh']) {
+for (const locale of ['en']) {
   test(`single creation still opens credentials and batch controls fit mobile (${locale})`, async ({ page }, testInfo) => {
     const single = { ...row(1), password: 'single-mailbox-password' };
     let body: Record<string, unknown> | undefined;
@@ -419,20 +417,19 @@ for (const locale of ['en', 'zh']) {
     await openCreate(page, locale);
     await testInfo.attach('desktop', { body: await page.screenshot(), contentType: 'image/png' });
     await page.setViewportSize({ width: 390, height: 844 });
-    const chinese = locale === 'zh';
-    const count = page.getByRole('textbox', { name: chinese ? '批量数量' : 'Batch count' });
+    const count = page.getByRole('textbox', { name: 'Batch count' });
     const card = form(page);
-    for (const control of [count, page.getByRole('button', { name: chinese ? '批量创建' : 'Create batch', exact: true }), page.getByRole('button', { name: chinese ? '导出 CSV' : 'Export CSV' })]) {
+    for (const control of [count, page.getByRole('button', { name: 'Create batch', exact: true }), page.getByRole('button', { name: 'Export CSV' })]) {
       await expect(control).toBeVisible();
       const bounds = (await control.boundingBox())!;
       expect(bounds.x).toBeGreaterThanOrEqual(0);
       expect(bounds.x + bounds.width).toBeLessThanOrEqual(390);
     }
     await testInfo.attach('mobile', { body: await page.screenshot({ fullPage: true }), contentType: 'image/png' });
-    await page.locator('.n-radio').getByText(chinese ? '单个创建' : 'Single creation', { exact: true }).click();
+    await page.locator('.n-radio').getByText('Single creation', { exact: true }).click();
     await expect(count).toBeHidden();
     await card.locator('.n-input-group .n-input input').first().fill('singlemailbox');
-    await card.getByRole('button', { name: chinese ? '创建邮箱' : 'Create Email Address', exact: true }).click();
+    await card.getByRole('button', { name: 'Create Email Address', exact: true }).click();
     await expect(page.locator('.n-modal')).toBeVisible();
     await expect(page.locator('.n-modal')).toContainText(single.address);
     await expect(page.locator('.n-modal')).toContainText(single.password);

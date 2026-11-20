@@ -37,7 +37,7 @@ No frontend variable is required for every deployment method. `VITE_API_BASE` is
 | ENV Variable | `app-config` Field | Required | Type | Default | Description |
 | --- | --- | --- | --- | --- | --- |
 | `VITE_API_BASE` | `API_BASE` | Depends on deployment | Text | Empty | Backend API root URL beginning with `https://` and without a trailing `/`; an empty value uses the same-origin API |
-| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | No | Text | `zh` | Default language: `zh`, `en`, `es`, `pt-BR`, `ja`, or `de` |
+| `VITE_DEFAULT_LANG` | `DEFAULT_LANG` | No | Text | `en` | Default language: `en`, `es`, `pt-BR`, `ja`, or `de` |
 | `VITE_CF_WEB_ANALY_TOKEN` | `CF_WEB_ANALY_TOKEN` | No | Text | Empty | Cloudflare Web Analytics Token |
 | `VITE_IS_TELEGRAM` | `IS_TELEGRAM` | No | Boolean | `false` | Whether to enable Telegram Mini App; see [Telegram Configuration](/en/guide/feature/telegram) |
 | `VITE_GOOGLE_AD_CLIENT` | `GOOGLE_AD_CLIENT` | No | Text | Empty | Google AdSense Client ID; see [Google Ads Configuration](/en/guide/feature/google-ads) |

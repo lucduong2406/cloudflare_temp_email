@@ -52,7 +52,7 @@ for (const scenario of [
   });
 }
 
-for (const scenario of ['expired', 'expiring', 'valid', 'no account', 'login expired', 'wrong password', 'text zh', 'text en', 'retry expired', 'retry unauthorized', 'unmatched path', 'server error', 'json client error', 'json server error'] as const) {
+for (const scenario of ['expired', 'expiring', 'valid', 'no account', 'login expired', 'wrong password', 'text en', 'retry expired', 'retry unauthorized', 'unmatched path', 'server error', 'json client error', 'json server error'] as const) {
   test(`Access token response handling: ${scenario}`, async ({ page }) => {
     await openApiTestPage(page);
 
@@ -84,7 +84,7 @@ for (const scenario of ['expired', 'expiring', 'valid', 'no account', 'login exp
       if (!['valid', 'expiring', 'wrong password'].includes(scenario)
         && (attempts.length === 1 || scenario === 'retry expired')) {
         await route.fulfill(scenario.startsWith('text')
-          ? { status: 401, body: scenario === 'text zh' ? '您的访问令牌已过期, 请刷新页面' : 'Your access token has expired, please refresh the page' }
+          ? { status: 401, body: 'Your access token has expired, please refresh the page' }
           : expiredTokenResponse);
         return;
       }
@@ -109,7 +109,7 @@ for (const scenario of ['expired', 'expiring', 'valid', 'no account', 'login exp
       }
     }, { initialToken, scenario, path });
 
-    const needsRefresh = !['valid', 'expiring', 'no account', 'wrong password', 'text zh', 'text en', 'unmatched path', 'server error', 'json client error', 'json server error'].includes(scenario);
+    const needsRefresh = !['valid', 'expiring', 'no account', 'wrong password', 'text en', 'unmatched path', 'server error', 'json client error', 'json server error'].includes(scenario);
     expect(refreshCount).toBe(needsRefresh ? 1 : 0);
     expect(attempts).toEqual(needsRefresh && scenario !== 'login expired' ? [initialToken, freshToken] : [initialToken]);
     expect(result.showAdminAuth).toBe(['wrong password', 'retry unauthorized'].includes(scenario));
@@ -118,9 +118,7 @@ for (const scenario of ['expired', 'expiring', 'valid', 'no account', 'login exp
     else if (['retry expired', 'no account', 'unmatched path'].includes(scenario)) expect(result.error).toContain('Access token expired');
     else if (scenario === 'server error') expect(result.error).toContain('Server error');
     else if (scenario.startsWith('text')) {
-      expect(result.error).toContain(scenario === 'text zh'
-        ? '您的访问令牌已过期, 请刷新页面'
-        : 'Your access token has expired, please refresh the page');
+      expect(result.error).toContain('Your access token has expired, please refresh the page');
     }
     else if (scenario.startsWith('json')) {
       expect(result.error).toContain('Operation failed');

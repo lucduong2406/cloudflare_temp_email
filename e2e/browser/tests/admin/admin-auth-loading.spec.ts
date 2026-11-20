@@ -10,7 +10,7 @@ test('waits for access settings before showing the Admin password dialog', async
     const detectAdminPassword = () => {
       const textNodes = document.createTreeWalker(document, NodeFilter.SHOW_TEXT);
       while (textNodes.nextNode()) {
-        if (textNodes.currentNode.textContent?.trim() === '管理员密码') {
+        if (textNodes.currentNode.textContent?.trim() === 'Admin Password') {
           testWindow.__adminPasswordRendered = true;
           return;
         }
@@ -39,17 +39,17 @@ test('waits for access settings before showing the Admin password dialog', async
     await route.continue();
   });
 
-  await page.goto(`${FRONTEND_URL}/zh/admin`);
+  await page.goto(`${FRONTEND_URL}/en/admin`);
   await settingsRequested;
 
   try {
-    await expect(page.getByText('管理员密码', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Admin Password', { exact: true })).toHaveCount(0);
   } finally {
     releaseSettings();
   }
 
-  await expect(page.getByText('快速设置', { exact: true })).toBeVisible();
-  await expect(page.getByText('管理员密码', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Quick Setup', { exact: true })).toBeVisible();
+  await expect(page.getByText('Admin Password', { exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => (
     window as Window & { __adminPasswordRendered?: boolean }
   ).__adminPasswordRendered)).toBe(false);

@@ -335,11 +335,6 @@ for (const { locale, roleRequired, roleType, addressType, create, generate, pref
     addressType: 'Custom mailbox', create: 'Batch Generate', generate: 'Generate',
     prefixError: 'Use only letters and digits, up to 29 characters. Leave empty for no prefix.',
   },
-  {
-    locale: 'zh', roleRequired: '请选择角色', roleType: '角色权益',
-    addressType: '专属邮箱', create: '批量生成', generate: '生成',
-    prefixError: '前缀仅支持英文字母和数字，最多 29 个字符；留空表示无前缀。',
-  },
 ]) {
   test(`Admin validates missing role and invalid prefix in ${locale}`, async ({ page }) => {
     await page.addInitScript(() => {

@@ -14,7 +14,7 @@ describe('APP_CONFIG', () => {
   beforeEach(() => {
     vi.resetModules()
     vi.stubEnv('VITE_API_BASE', 'https://build.example.com')
-    vi.stubEnv('VITE_DEFAULT_LANG', 'zh')
+    vi.stubEnv('VITE_DEFAULT_LANG', 'en')
     vi.stubEnv('VITE_IS_TELEGRAM', 'false')
   })
 
@@ -27,7 +27,7 @@ describe('APP_CONFIG', () => {
     const { APP_CONFIG } = await import('../config')
 
     expect(APP_CONFIG.API_BASE).toBe('https://build.example.com')
-    expect(APP_CONFIG.DEFAULT_LANG).toBe('zh')
+    expect(APP_CONFIG.DEFAULT_LANG).toBe('en')
   })
 
   it('overrides only settings provided by index.html', async () => {
@@ -45,7 +45,7 @@ describe('APP_CONFIG', () => {
     const { APP_CONFIG } = await import('../config')
 
     expect(APP_CONFIG.API_BASE).toBe('')
-    expect(APP_CONFIG.DEFAULT_LANG).toBe('zh')
+    expect(APP_CONFIG.DEFAULT_LANG).toBe('en')
   })
 
   it('falls back to build settings for invalid runtime value types', async () => {
@@ -54,7 +54,7 @@ describe('APP_CONFIG', () => {
     const { APP_CONFIG } = await import('../config')
 
     expect(APP_CONFIG.API_BASE).toBe('https://build.example.com')
-    expect(APP_CONFIG.DEFAULT_LANG).toBe('zh')
+    expect(APP_CONFIG.DEFAULT_LANG).toBe('en')
     expect(APP_CONFIG.IS_TELEGRAM).toBe('false')
   })
 

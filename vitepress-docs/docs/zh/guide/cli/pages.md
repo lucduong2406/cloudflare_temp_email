@@ -29,7 +29,7 @@ cp .env.example .env.prod
 
 例如: `VITE_API_BASE=https://xxx.xxx.workers.dev`
 
-可通过 `VITE_DEFAULT_LANG` 设置前端默认语言，支持 `zh`、`en`、`es`、`pt-BR`、`ja`、`de`，未配置或配置无效时使用 `zh`。
+可通过 `VITE_DEFAULT_LANG` 设置前端默认语言，支持 `en`、`es`、`pt-BR`、`ja`、`de`，未配置或配置无效时使用 `en`。
 
 例如: `VITE_DEFAULT_LANG=en`
 

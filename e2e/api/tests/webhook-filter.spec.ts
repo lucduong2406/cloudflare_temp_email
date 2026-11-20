@@ -194,10 +194,6 @@ test('Webhook filter rejects invalid configuration without replacing saved setti
         }
       }
       expect(await (await request.get(`${WORKER_URL}${base}/settings`, { headers })).json()).toEqual(original);
-      const zh = await request.post(`${WORKER_URL}${base}/check_filter`, {
-        headers: { ...headers, 'x-lang': 'zh' }, data: { ...original, filter: {} },
-      });
-      expect(await zh.text()).toContain('无效的过滤规则');
       for (const data of [null, [], { mail_id: 0 }, { mail_id: 1.5 }, { mail_id: '1' }]) {
         expect((await request.post(`${WORKER_URL}${base}/check_filter`, { headers, data })).status()).toBe(400);
       }
